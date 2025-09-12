@@ -16,13 +16,13 @@ public class Main {
             dir.mkdirs();
         }
 
-        File archivoUsuarios = new File("C:\\Users\\kike\\Desktop\\txt visual\\usuarios.txt");
+        File archivoUsuarios = new File("C:\\Users\\kike\\Desktop\\visualProyectos\\Servidor\\usuariosusuarios.txt");
         if (!archivoUsuarios.exists()) {
             try {
                 archivoUsuarios.createNewFile();
                 System.out.println("Archivo 'usuarios.txt' creado.");
             
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\kike\\Desktop\\txt visual\\usuarios.txt", true))) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\kike\\Desktop\\visualProyectos\\Servidor\\usuariosusuarios.txt", true))) {
                     writer.write("admin,1234");
                     writer.newLine();
                 }
@@ -117,7 +117,7 @@ public class Main {
                         if (usuarioExiste(usuario)) {
                             escritor.println("Ese nombre de usuario ya existe. Inténtalo de nuevo.");
                         } else {
-                            try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\kike\\Desktop\\txt visual\\usuarios.txt", true))) {
+                            try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\kike\\Desktop\\visualProyectos\\Servidor\\usuariosusuarios.txt", true))) {
                                 writer.write(usuario + "," + pass);
                                 writer.newLine();
                                 escritor.println("¡Registro completado! Ahora puedes iniciar sesión.");
@@ -203,7 +203,7 @@ public class Main {
       
         private boolean validarCredenciales(String usuario, String pass) throws IOException {
             synchronized (lockArchivo) {
-                try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\kike\\Desktop\\txt visual\\usuarios.txt"))) {
+                try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\kike\\Desktop\\visualProyectos\\Servidor\\usuariosusuarios.txt"))) {
                     String linea;
                     while ((linea = reader.readLine()) != null) {
                         String[] partes = linea.split(",", 2);
@@ -218,7 +218,7 @@ public class Main {
 
         private boolean usuarioExiste(String usuario) throws IOException {
             synchronized (lockArchivo) {
-                try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\kike\\Desktop\\txt visual\\usuarios.txt"))) {
+                try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\kike\\Desktop\\visualProyectos\\Servidor\\usuariosusuarios.txt"))) {
                     String linea;
                     while ((linea = reader.readLine()) != null) {
                         String[] partes = linea.split(",", 2);
