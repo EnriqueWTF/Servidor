@@ -14,23 +14,37 @@ public class mmain {
   System.out.println("Esperando al cliente...");
   Socket cliente = servidor.accept();
   System.out.println("Cliente conectado");
-  
-   BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-    String mensaje = entrada.readLine();
-    System.out.println("Cliente te dice: " + mensaje);
+  System.out.println("Bienvenido, quieres enviar un mensaje?, SI/NO");
 
-   BufferedWriter write = new BufferedWriter(new FileWriter("mensaje.txt"));
-    write.write(mensaje);
+    BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+    String mensaje = entrada.readLine();
+
+  if(mensaje.equals("NO")){
    
-   write.close();
+  
+
+      System.out.println("Gracias por usar el programa");
+      System.exit(0);
+
+  }else if(mensaje.equals("SI")){
+
+    System.out.println("Escribe tu mensaje");
+
+
+    String mensajeReal = entrada.readLine();
+    
+    try(BufferedWriter write = new BufferedWriter(new FileWriter(new File("mensaje.txt")))){
+    write.write(mensajeReal);
+
+    }
+    
+
 
   servidor.close();
     
   cliente.close();
     }
- 
-
-    
+  }
 
     
 }
