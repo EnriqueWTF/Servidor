@@ -12,12 +12,28 @@ import java.io.IOException;
 import java.io.File;  
 
 public class mmain {
+   
+public static void UsuarioMensajes(BufferedReader entrada, String usuario) throws IOException {
+        while (true) {
+            System.out.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Cerrar sesion");
+            String opcion = entrada.readLine();
+
+            if (opcion == null || opcion.equals("3")) {
+                System.out.println("Usuario '" + usuario + "' ha cerrado sesión.");
+                break; 
+            }
+
+        }
+      }
+
    public static boolean  registerUser(String nombreusuario)throws IOException{
   if (userExists(nombreusuario)) {
         return false;
     }
     String userLine = nombreusuario.trim() + System.lineSeparator();
     Files.write(Paths.get("nombre.txt"), userLine.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+  
+
     return true;
 }
 
@@ -124,9 +140,7 @@ public class mmain {
 
       String nombre = entrada.readLine();
 
-     try(BufferedWriter write = new BufferedWriter(new FileWriter("nombre.txt"))){
-      write.write(nombre);
-     }
+     
      try(BufferedWriter write2 = new BufferedWriter(new FileWriter("mensaje.txt"))){
       write2.write(NombrePersona);
 
