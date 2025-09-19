@@ -96,13 +96,47 @@ public class mmain {
    if (opcion.equals("2")){
     String loginUser = entrada.readLine();
     if(userExists(loginUser)){
-    
-
+    System.out.println("Sesion iniciada.");
+    System.out.println("Elige la opcion que deseas (1). Enviar mensaje (2). Cerrar sesion");
+   
 
     }
+ 
+
+
+
+
+
+    String mensaje2 = entrada.readLine();
+    if(mensaje2.equals("2")){
+    System.out.println("Gracias  por usar el programa");
+    System.exit(0);
     
 
-    }else {
+    }else if(mensaje2.equals("1")){
+      
+      System.out.println("Escribe el nombre de la persona que deseas enviar el mensaje");
+      String NombrePersona = entrada.readLine();
+
+      
+
+      System.out.println("Escribe tu mensaje");
+
+      String nombre = entrada.readLine();
+
+     try(BufferedWriter write = new BufferedWriter(new FileWriter("nombre.txt"))){
+      write.write(nombre);
+     }
+     try(BufferedWriter write2 = new BufferedWriter(new FileWriter("mensaje.txt"))){
+      write2.write(NombrePersona);
+
+
+     }
+     }
+    
+    
+    
+    else {
 
       System.out.println("El usuario no existe.");
     }
@@ -121,35 +155,13 @@ public class mmain {
       
 
    
-    System.out.println("Elige la opcion que deseas");
-    System.out.println("1. enviar un mensaje");
-    System.out.println("2. salir");
+    
    
-    String mensaje2 = entrada.readLine();
-
-
-    if(mensaje2.equals("2")){
-    System.out.println("Gracias  por usar el programa");
-    System.exit(0);
   
 
 
       
-     }else if(mensaje2.equals("1")){
-      
-      System.out.println("Escribe el nombre de la persona que deseas enviar el mensaje");
-      String mensajeReal = entrada.readLine();
-      System.out.println("Escribe tu mensaje");
-      String nombre = entrada.readLine();
-     try(BufferedWriter write = new BufferedWriter(new FileWriter("nombre.txt"))){
-      write.write(nombre);
-     }
-     try(BufferedWriter write2 = new BufferedWriter(new FileWriter("mensaje.txt"))){
-      write2.write(mensajeReal);
-
-
-     }
-     }
+     
      
       System.out.println("Mensaje y nombre guardados correctamente.");
     }
