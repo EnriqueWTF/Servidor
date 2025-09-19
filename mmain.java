@@ -1,6 +1,7 @@
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -11,14 +12,24 @@ import java.io.IOException;
 import java.io.File;  
 
 public class mmain {
+   public static boolean  registerUser(String nombreusuario)throws IOException{
+
+
+  if (userExists(nombreusuario)) {
+        return false;
+    }
+    String userLine = nombreusuario.trim() + System.lineSeparator();
+    Files.write(Paths.get("nombre.txt"), userLine.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+    return true;
+}
   
     public static boolean userExists(String nombreusario)throws IOException{
-    File usuarios = new File("Usuarios_File");    
+    File usuarios = new File("nombre.txt");    
     if(!usuarios.exists() || nombreusario== null){
 
       return false;
     }
-    List<String> lineas = Files.readAllLines(Paths.get("Usuarios_File"));
+    List<String> lineas = Files.readAllLines(Paths.get("nombre.txt"));
   //for de la morma mas moderna para estos casos: for (String line : lines), no lo usare de momento
 
     for (int i = 0; i < lineas.size(); i++) {
