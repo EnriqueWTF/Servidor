@@ -16,10 +16,10 @@ public class mmain {
    
     public static void UsuarioMensajes(BufferedReader entrada, String usuario) throws IOException {
         while (true) {
-            System.out.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Cerrar sesion");
+            System.out.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion");
             String opcion = entrada.readLine();
 
-            if (opcion == null || opcion.equals("3")) {
+            if (opcion == null || opcion.equals("4")) { 
                 System.out.println("Usuario '" + usuario + "' ha cerrado sesión.");
                 break; 
             }
@@ -52,29 +52,49 @@ public class mmain {
                     System.out.println("No tienes mensajes.");
                 } else {
                     for (File archivoMensaje : mensajes) {
-                        String contenido = new String(Files.readAllBytes(archivoMensaje.toPath()));
+                        
+                        String key = archivoMensaje.getName().replace(".txt", "");
                         System.out.println("--------------------");
+                        System.out.println("Clave del Mensaje: " + key);
+                        String contenido = new String(Files.readAllBytes(archivoMensaje.toPath()));
                         System.out.println(contenido);
                     }
+                }
+            
+            } else if (opcion.equals("3")) {
+                System.out.println("Escribe la clave del mensaje que quieres eliminar:");
+                String keyToDelete = entrada.readLine();
+
+                if (keyToDelete == null || keyToDelete.trim().isEmpty()) {
+                    System.out.println("La clave no puede estar vacía.");
+                    continue;
+                }
+
+                File fileToDelete = new File("messages/" + usuario.trim() + "/" + keyToDelete.trim() + ".txt");
+
+                if (fileToDelete.exists()) {
+                    if (fileToDelete.delete()) {
+                        System.out.println("Mensaje eliminado correctamente.");
+                    } else {
+                        System.out.println("Error: No se pudo eliminar el mensaje.");
+                    }
+                } else {
+                    System.out.println("Error: No se encontró ningún mensaje con esa clave.");
                 }
             }
         }
     }
 
-    
     public static boolean registerUser(String nombreusuario, String password) throws IOException {
         if (userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
             return false;
         }
-       
         String userLine = nombreusuario.trim() + "," + password.trim() + System.lineSeparator();
         Files.write(Paths.get("nombre.txt"), userLine.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-        
         new File("messages/" + nombreusuario.trim()).mkdirs();
         return true;
     }
 
-   
     public static boolean userExists(String nombreusario) throws IOException {
         File usuarios = new File("nombre.txt");    
         if (!usuarios.exists() || nombreusario == null) {
@@ -90,7 +110,6 @@ public class mmain {
         return false;
     }
 
-    
     public static boolean checkCredentials(String nombreusuario, String password) throws IOException {
         File usuarios = new File("nombre.txt");
         if (!usuarios.exists() || nombreusuario == null || password == null) {
@@ -102,7 +121,6 @@ public class mmain {
             if (parts.length == 2) {
                 String storedUser = parts[0].trim();
                 String storedPass = parts[1].trim();
-               
                 if (storedUser.equalsIgnoreCase(nombreusuario.trim()) && storedPass.equals(password.trim())) {
                     return true;
                 }
@@ -127,7 +145,6 @@ public class mmain {
                     continue;
                 }
 
-        
                 if (opcion.equals("1")) {
                     System.out.println("Nombre:");
                     String nuevoUsuario = entrada.readLine();
