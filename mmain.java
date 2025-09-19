@@ -18,7 +18,7 @@ public class mmain {
 
   Socket cliente = servidor.accept();
   System.out.println("Cliente conectado");
-  System.out.println("Bienvenido, quieres enviar un mensaje? (SI/NO)");
+  System.out.println("Menu: (1)Registrarte (2)Iniciar sesion");
   
 
    try (
@@ -28,19 +28,33 @@ public class mmain {
 
 
     String mensaje = entrada.readLine();
-   if(mensaje == null){
+    if(mensaje == null){
 
   System.out.println("Sesion cerrada");
   continue;
    }
-  if(mensaje.equals("NO")){
-   
-  
+   String opcion= entrada.readLine();
 
-      System.out.println("El cliente decide n");
+   if(opcion.equals("1")){
+    System.out.println("Nombre:");
+
+
+
+
+     System.out.println("Contraseña");
+   }else if(opcion.equals("2")){
+
+   
+
+
+   }
+
+
+
+
       
 
-  }else if(mensaje.equals("SI")){
+   if(mensaje.equals("SI")){
     System.out.println("Elige la opcion que deseas");
     System.out.println("1. enviar un mensaje");
     System.out.println("2. salir");
@@ -54,7 +68,7 @@ public class mmain {
   
 
 
-    
+      
      }else if(mensaje2.equals("1")){
       
       System.out.println("Escribe el nombre de la persona que deseas enviar el mensaje");
