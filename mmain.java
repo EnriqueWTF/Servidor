@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.UUID;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
@@ -31,7 +32,17 @@ public static void UsuarioMensajes(BufferedReader entrada, String usuario) throw
                 if (!userExists(destinatario)) {
                     System.out.println("Error: El destinatario '" + destinatario + "' no existe.");
                     continue;
+                }else{
+                 System.out.println("Escribe tu mensaje:");
+                String mensaje = entrada.readLine();
+
+                String Key = UUID.randomUUID().toString();
+                String nombreArchivo = "mensaje.txt" + destinatario.trim() + "/" + Key + ".txt";
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
+                    writer.write("De: " + usuario.trim() + "\nMensaje: " + mensaje);
                 }
+              }
 
 
 
