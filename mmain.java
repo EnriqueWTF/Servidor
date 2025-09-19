@@ -30,8 +30,8 @@ public class mmain {
     System.out.println("Elige la opcion que deseas");
     System.out.println("1. enviar un mensaje");
     System.out.println("2. salir");
-    BufferedReader entrada2 = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-    String mensaje2 = entrada2.readLine();
+   
+    String mensaje2 = entrada.readLine();
 
 
     if(mensaje2.equals("2")){
@@ -42,22 +42,24 @@ public class mmain {
 
     
      }else if(mensaje2.equals("1")){
+
       System.out.println("Escribe el nombre de la persona que deseas enviar el mensaje");
-      
-
-
+      String mensajeReal = entrada.readLine();
+      System.out.println("Escribe tu mensaje");
+      String nombre = entrada.readLine();
+      BufferedWriter write = new BufferedWriter(new FileWriter("nombre.txt"));
+      write.write(nombre);
+      write.newLine();
+      write.write(mensajeReal);
+      write.close();
 
     }
     
-    System.out.println("Escribe tu mensaje");
+   
 
-
-    String mensajeReal = entrada.readLine();
     
-    try(BufferedWriter write = new BufferedWriter(new FileWriter(new File("mensaje.txt")))){
-    write.write(mensajeReal);
-
-    }
+    
+    
     
 
 
