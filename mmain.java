@@ -12,19 +12,29 @@ public class mmain {
     
   ServerSocket servidor = new ServerSocket(8080);
   System.out.println("Esperando al cliente...");
+
+
+  while(true){
+
   Socket cliente = servidor.accept();
   System.out.println("Cliente conectado");
   System.out.println("Bienvenido, quieres enviar un mensaje? (SI/NO)");
+  
 
-    BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+   try (
+                BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                Socket clientSocket = cliente; // Para que se cierre automáticamente
+            ) {
+
+
     String mensaje = entrada.readLine();
 
   if(mensaje.equals("NO")){
    
   
 
-      System.out.println("Gracias por usar el programa");
-      System.exit(0);
+      System.out.println("El cliente decide n");
+      
 
   }else if(mensaje.equals("SI")){
     System.out.println("Elige la opcion que deseas");
@@ -42,17 +52,25 @@ public class mmain {
 
     
      }else if(mensaje2.equals("1")){
-
+      
       System.out.println("Escribe el nombre de la persona que deseas enviar el mensaje");
       String mensajeReal = entrada.readLine();
       System.out.println("Escribe tu mensaje");
       String nombre = entrada.readLine();
-      BufferedWriter write = new BufferedWriter(new FileWriter("nombre.txt"));
+     try(BufferedWriter write = new BufferedWriter(new FileWriter("nombre.txt"))){
       write.write(nombre);
-      write.newLine();
-      write.write(mensajeReal);
-      write.close();
+     }
+     try(BufferedWriter write2 = new BufferedWriter(new FileWriter("mensaje.txt"))){
+      write2.write(mensajeReal);
 
+
+     }
+     }
+     
+      System.out.println("Mensaje y nombre guardados correctamente.");
+
+    } catch(Exception e){
+      System.out.println("Error con el cliente"+ e.getMessage());
     }
     
    
@@ -63,9 +81,7 @@ public class mmain {
     
 
 
-  servidor.close();
-    
-  cliente.close();
+
     }
   }
 
