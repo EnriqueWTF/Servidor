@@ -13,8 +13,6 @@ import java.io.File;
 
 public class mmain {
    public static boolean  registerUser(String nombreusuario)throws IOException{
-
-
   if (userExists(nombreusuario)) {
         return false;
     }
@@ -22,29 +20,34 @@ public class mmain {
     Files.write(Paths.get("nombre.txt"), userLine.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
     return true;
 }
+
+
+
+
+
   
     public static boolean userExists(String nombreusario)throws IOException{
     File usuarios = new File("nombre.txt");    
     if(!usuarios.exists() || nombreusario== null){
-
       return false;
     }
     List<String> lineas = Files.readAllLines(Paths.get("nombre.txt"));
-  //for de la morma mas moderna para estos casos: for (String line : lines), no lo usare de momento
-
+  //for de la morma mas moderna para estos casos: for (String line : lines), no lo usare de moment
     for (int i = 0; i < lineas.size(); i++) {
     String linea = lineas.get(i); 
-
       if(linea.trim().equalsIgnoreCase(nombreusario.trim())){
-       
        return true;
       }
     }
-
-
-
       return false;
     }
+
+
+
+
+
+
+
     public static void main(String[] args) throws Exception {
     
   ServerSocket servidor = new ServerSocket(8080);
@@ -61,38 +64,63 @@ public class mmain {
    try (
                 BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
                 Socket clientSocket = cliente; // Para que se cierre automáticamente
-            ) {
+   ) {
 
 
-    String mensaje = entrada.readLine();
-    if(mensaje == null){
+    
 
-  System.out.println("Sesion cerrada");
-  continue;
-   }
-   String opcion= entrada.readLine();
+    
+
+   String opcion = entrada.readLine();
+  if(opcion == null){
+    System.out.println("El cliente se desconecto");
+    continue;
+  }
 
    if(opcion.equals("1")){
-    System.out.println("Nombre:");
+
+   System.out.println("Nombre:");
+   String nuevoUsuario = entrada.readLine();
+    
+
+    if(registerUser(nuevoUsuario)){
+    System.out.println("Usuario"+ nuevoUsuario+ "Usuario registrado correctamente.");
+
+    }else{
+      System.out.println("El usuario ya esta registrado");
+
+    }
+    }
+
+
+   if (opcion.equals("2")){
+    String loginUser = entrada.readLine();
+    if(userExists(loginUser)){
+    
+
+
+    }
+    
+
+    }else {
+
+      System.out.println("El usuario no existe.");
+    }
+
+    
 
 
 
 
-     System.out.println("Contraseña");
-
-   }else if(opcion.equals("2")){
-
+    
    
-    continue;
-
-   }
 
 
 
 
       
 
-   if(mensaje.equals("SI")){
+   
     System.out.println("Elige la opcion que deseas");
     System.out.println("1. enviar un mensaje");
     System.out.println("2. salir");
@@ -130,7 +158,7 @@ public class mmain {
       System.out.println("Error con el cliente"+ e.getMessage());
 
     }
-    
+  }
    
 
     
