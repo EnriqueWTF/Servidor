@@ -28,7 +28,11 @@ public class mmain {
 
 
     String mensaje = entrada.readLine();
+   if(mensaje == null){
 
+  System.out.println("Sesion cerrada");
+  continue;
+   }
   if(mensaje.equals("NO")){
    
   
@@ -68,9 +72,11 @@ public class mmain {
      }
      
       System.out.println("Mensaje y nombre guardados correctamente.");
-
+    }
     } catch(Exception e){
+
       System.out.println("Error con el cliente"+ e.getMessage());
+
     }
     
    
