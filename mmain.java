@@ -14,7 +14,7 @@ public class mmain {
   System.out.println("Esperando al cliente...");
   Socket cliente = servidor.accept();
   System.out.println("Cliente conectado");
-  System.out.println("Bienvenido, quieres enviar un mensaje?, SI/NO");
+  System.out.println("Bienvenido, quieres enviar un mensaje? (SI/NO)");
 
     BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
     String mensaje = entrada.readLine();
@@ -27,7 +27,28 @@ public class mmain {
       System.exit(0);
 
   }else if(mensaje.equals("SI")){
+    System.out.println("Elige la opcion que deseas");
+    System.out.println("1. enviar un mensaje");
+    System.out.println("2. salir");
+    BufferedReader entrada2 = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+    String mensaje2 = entrada2.readLine();
 
+
+    if(mensaje2.equals("2")){
+    System.out.println("Gracias  por usar el programa");
+    System.exit(0);
+  
+
+
+    
+     }else if(mensaje2.equals("1")){
+      System.out.println("Escribe el nombre de la persona que deseas enviar el mensaje");
+      
+
+
+
+    }
+    
     System.out.println("Escribe tu mensaje");
 
 
