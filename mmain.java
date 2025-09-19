@@ -2,10 +2,12 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter; 
 import java.net.ServerSocket;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -14,25 +16,25 @@ import java.io.File;
 
 public class mmain {
    
-    public static void UsuarioMensajes(BufferedReader entrada, String usuario) throws IOException {
+    public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
         while (true) {
-            System.out.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion");
+            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion");
             String opcion = entrada.readLine();
 
             if (opcion == null || opcion.equals("4")) { 
-                System.out.println("Usuario '" + usuario + "' ha cerrado sesión.");
+                salida.println("Cerrando sesion...");
                 break; 
             }
 
             if (opcion.equals("1")) {
-                System.out.println("Escribe el nombre del destinatario:");
+                salida.println("Escribe el nombre del destinatario:");
                 String destinatario = entrada.readLine();
 
                 if (!userExists(destinatario)) {
-                    System.out.println("Error: El destinatario '" + destinatario + "' no existe.");
+                    salida.println("Error: El destinatario '" + destinatario + "' no existe.");
                     continue;
                 } else {
-                    System.out.println("Escribe tu mensaje:");
+                    salida.println("Escribe tu mensaje:");
                     String mensaje = entrada.readLine();
 
                     String Key = UUID.randomUUID().toString();
@@ -41,45 +43,58 @@ public class mmain {
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
                         writer.write("De: " + usuario.trim() + "\nMensaje: " + mensaje);
                     }
-                    System.out.println("Mensaje enviado.");
+                    salida.println("Mensaje enviado.");
                 }
             } else if (opcion.equals("2")) {
-                System.out.println("--- Tus Mensajes ---");
+                salida.println("--- Tus Mensajes ---");
                 File buzonUsuario = new File("messages/" + usuario.trim());
                 File[] mensajes = buzonUsuario.listFiles();
 
                 if (mensajes == null || mensajes.length == 0) {
-                    System.out.println("No tienes mensajes.");
+                    salida.println("No tienes mensajes.");
                 } else {
                     for (File archivoMensaje : mensajes) {
-                        
-                        String key = archivoMensaje.getName().replace(".txt", "");
-                        System.out.println("--------------------");
-                        System.out.println("Clave del Mensaje: " + key);
                         String contenido = new String(Files.readAllBytes(archivoMensaje.toPath()));
-                        System.out.println(contenido);
+                        salida.println("--------------------");
+                        salida.println(contenido);
                     }
                 }
-            
             } else if (opcion.equals("3")) {
-                System.out.println("Escribe la clave del mensaje que quieres eliminar:");
-                String keyToDelete = entrada.readLine();
+                salida.println("--- Eliminar Mensaje ---");
+                File buzonUsuario = new File("messages/" + usuario.trim());
+                File[] mensajes = buzonUsuario.listFiles();
 
-                if (keyToDelete == null || keyToDelete.trim().isEmpty()) {
-                    System.out.println("La clave no puede estar vacía.");
+                if (mensajes == null || mensajes.length == 0) {
+                    salida.println("No tienes mensajes para eliminar.");
                     continue;
                 }
 
-                File fileToDelete = new File("messages/" + usuario.trim() + "/" + keyToDelete.trim() + ".txt");
+                
+                List<File> messageFiles = new ArrayList<>();
+                salida.println("Tus mensajes:");
+                for (int i = 0; i < mensajes.length; i++) {
+                    messageFiles.add(mensajes[i]);
+                    String contentPreview = new String(Files.readAllBytes(mensajes[i].toPath())).split("\n")[0]; 
+                    salida.println("[" + (i + 1) + "] " + contentPreview);
+                }
 
-                if (fileToDelete.exists()) {
-                    if (fileToDelete.delete()) {
-                        System.out.println("Mensaje eliminado correctamente.");
+                salida.println("Elige el numero del mensaje a eliminar (o 'cancelar'):");
+                String numStr = entrada.readLine();
+
+                try {
+                    int numToDelete = Integer.parseInt(numStr);
+                    if (numToDelete > 0 && numToDelete <= messageFiles.size()) {
+                        File fileToDelete = messageFiles.get(numToDelete - 1); 
+                        if (fileToDelete.delete()) {
+                            salida.println("Mensaje eliminado correctamente.");
+                        } else {
+                            salida.println("Error: No se pudo eliminar el mensaje.");
+                        }
                     } else {
-                        System.out.println("Error: No se pudo eliminar el mensaje.");
+                        salida.println("Numero invalido.");
                     }
-                } else {
-                    System.out.println("Error: No se encontró ningún mensaje con esa clave.");
+                } catch (NumberFormatException e) {
+                    salida.println("Entrada invalida. Operacion cancelada.");
                 }
             }
         }
@@ -97,31 +112,23 @@ public class mmain {
 
     public static boolean userExists(String nombreusario) throws IOException {
         File usuarios = new File("nombre.txt");    
-        if (!usuarios.exists() || nombreusario == null) {
-            return false;
-        }
+        if (!usuarios.exists() || nombreusario == null) return false;
         List<String> lineas = Files.readAllLines(Paths.get("nombre.txt"));
         for (String linea : lineas) {
             String[] parts = linea.split(",");
-            if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(nombreusario.trim())) {
-                return true;
-            }
+            if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(nombreusario.trim())) return true;
         }
         return false;
     }
 
     public static boolean checkCredentials(String nombreusuario, String password) throws IOException {
         File usuarios = new File("nombre.txt");
-        if (!usuarios.exists() || nombreusuario == null || password == null) {
-            return false;
-        }
+        if (!usuarios.exists() || nombreusuario == null || password == null) return false;
         List<String> lineas = Files.readAllLines(Paths.get("nombre.txt"));
         for (String linea : lineas) {
             String[] parts = linea.split(",");
             if (parts.length == 2) {
-                String storedUser = parts[0].trim();
-                String storedPass = parts[1].trim();
-                if (storedUser.equalsIgnoreCase(nombreusuario.trim()) && storedPass.equals(password.trim())) {
+                if (parts[0].trim().equalsIgnoreCase(nombreusuario.trim()) && parts[1].trim().equals(password.trim())) {
                     return true;
                 }
             }
@@ -132,44 +139,44 @@ public class mmain {
     public static void main(String[] args) throws Exception {
         new File("messages").mkdirs();
         ServerSocket servidor = new ServerSocket(8080);
-        System.out.println("Esperando al cliente...");
+        System.out.println("Servidor iniciado. Esperando al cliente...");
 
         while (true) {
             Socket cliente = servidor.accept();
-            System.out.println("Cliente conectado");
-            System.out.println("Menu: (1)Registrarte (2)Iniciar sesion");
+            System.out.println("Cliente conectado: " + cliente.getInetAddress());
   
-            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()))) {
+            
+            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                 PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)) {
+                
+                salida.println("Menu: (1)Registrarte (2)Iniciar sesion");
                 String opcion = entrada.readLine();
-                if (opcion == null) {
-                    continue;
-                }
+                if (opcion == null) continue;
 
                 if (opcion.equals("1")) {
-                    System.out.println("Nombre:");
+                    salida.println("Nombre:");
                     String nuevoUsuario = entrada.readLine();
-                    System.out.println("Crea una contraseña:");
+                    salida.println("Crea una contraseña:");
                     String nuevaPassword = entrada.readLine();
     
                     if (registerUser(nuevoUsuario, nuevaPassword)) {
-                        System.out.println("Usuario " + nuevoUsuario + " registrado correctamente.");
-                        System.out.println("Iniciando sesion...");
-                        UsuarioMensajes(entrada, nuevoUsuario);
+                        salida.println("Usuario " + nuevoUsuario + " registrado correctamente. Iniciando sesion...");
+                        UsuarioMensajes(entrada, salida, nuevoUsuario);
                     } else {
-                        System.out.println("El usuario ya esta registrado o los datos son inválidos.");
+                        salida.println("El usuario ya esta registrado o los datos son inválidos.");
                     }
                 
                 } else if (opcion.equals("2")) {
-                    System.out.println("Nombre de usuario para iniciar sesion: ");
+                    salida.println("Nombre de usuario para iniciar sesion: ");
                     String loginUser = entrada.readLine();
-                    System.out.println("Contraseña:");
+                    salida.println("Contraseña:");
                     String loginPassword = entrada.readLine();
 
                     if (checkCredentials(loginUser, loginPassword)) {
-                        System.out.println("Sesion iniciada.");
-                        UsuarioMensajes(entrada, loginUser);
+                        salida.println("Sesion iniciada.");
+                        UsuarioMensajes(entrada, salida, loginUser);
                     } else {
-                        System.out.println("Usuario o contraseña incorrectos.");
+                        salida.println("Usuario o contraseña incorrectos.");
                     }
                 }
             } catch (Exception e) {
