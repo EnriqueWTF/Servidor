@@ -1,13 +1,39 @@
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.File;  
 
 public class mmain {
-    
+  
+    public static boolean userExists(String nombreusario)throws IOException{
+    File usuarios = new File("Usuarios_File");    
+    if(!usuarios.exists() || nombreusario== null){
+
+      return false;
+    }
+    List<String> lineas = Files.readAllLines(Paths.get("Usuarios_File"));
+  //for de la morma mas moderna para estos casos: for (String line : lines), no lo usare de momento
+
+    for (int i = 0; i < lineas.size(); i++) {
+    String linea = lineas.get(i); 
+
+      if(linea.trim().equalsIgnoreCase(nombreusario.trim())){
+       
+       return true;
+      }
+    }
+
+
+
+      return false;
+    }
     public static void main(String[] args) throws Exception {
     
   ServerSocket servidor = new ServerSocket(8080);
@@ -42,10 +68,11 @@ public class mmain {
 
 
      System.out.println("Contraseña");
+
    }else if(opcion.equals("2")){
 
    
-
+    continue;
 
    }
 
