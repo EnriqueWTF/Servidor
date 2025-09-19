@@ -23,9 +23,25 @@ public static void UsuarioMensajes(BufferedReader entrada, String usuario) throw
                 break; 
             }
 
-        }
-      }
+             if (opcion.equals("1")) {
+                
+                System.out.println("Escribe el nombre del destinatario:");
+                String destinatario = entrada.readLine();
 
+                if (!userExists(destinatario)) {
+                    System.out.println("Error: El destinatario '" + destinatario + "' no existe.");
+                    continue;
+                }
+
+
+
+
+
+
+      
+      }
+    }
+  }
    public static boolean  registerUser(String nombreusuario)throws IOException{
   if (userExists(nombreusuario)) {
         return false;
