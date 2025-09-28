@@ -35,15 +35,19 @@ public class Main {
 
 
 
-
-         private static void prepararArchivoUsuarios() {
-
-
+       private static void prepararArchivoUsuarios() throws IOException {
+        File archivo = new File(RUTA_ARCHIVO_USUARIOS);
+        if (archivo.createNewFile()) {
+            System.out.println("Archivo '" + RUTA_ARCHIVO_USUARIOS + "' creado.");
+        
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO_USUARIOS, true))) {
+                writer.write("admin,1234");
+                writer.newLine();
+            }
+        } else {
+            System.out.println("Usando el archivo '" + RUTA_ARCHIVO_USUARIOS + "' existente.");
         }
-        throw new UnsupportedOperationException("Unimplemented method 'prepararArchivoUsuarios'");
     }
-
-
 
 
         {
