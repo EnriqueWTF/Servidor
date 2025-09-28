@@ -15,12 +15,42 @@ public class Main {
     private static final Object lockArchivo = new Object();
 
     public static void main(String[] args)throws IOException {
-          // Asegurarse de que el archivo de usuarios exista al iniciar el servidor
-        try {
+
+
+           try {
+            prepararArchivoUsuarios();
+            iniciarBucleServidor(8080);
+        } catch (IOException e) {
+            System.err.println("Error fatal del servidor: " + e.getMessage());
+        }
+    }
+
+
+
+
+         private static void iniciarBucleServidor(int i) {
+       
+        throw new UnsupportedOperationException("Unimplemented method 'iniciarBucleServidor'");
+    }
+
+
+
+
+         private static void prepararArchivoUsuarios() {
+
+
+        }
+        throw new UnsupportedOperationException("Unimplemented method 'prepararArchivoUsuarios'");
+    }
+
+
+
+
+        {
             File archivo = new File("C:\\Users\\Enrique\\Desktop\\Archivos de texto\\usuarios.txt");
             if (archivo.createNewFile()) {
                 System.out.println("Archivo 'usuarios.txt' creado.");
-                // Opcional: Añadir un usuario administrador por defecto la primera vez
+             
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter("C:\\Users\\Enrique\\Desktop\\Archivos de texto\\usuarios.txt", true))) {
                     writer.write("admin,1234");
                     writer.newLine();
@@ -47,7 +77,7 @@ public class Main {
         }
     }
 
-    // El resto del código no necesita cambios
+   
     private static class ManejadorCliente extends Thread {
         private final Socket clienteSocket;
 
@@ -91,7 +121,7 @@ public class Main {
                     if (validarCredenciales(usuario, pass)) {
                         escritor.println("¡Acceso concedido! Bienvenido, " + usuario + ".");
                         System.out.println("Usuario '" + usuario + "' ha iniciado sesión correctamente.");
-                        break; // Termina la comunicación
+                        break; 
                     } else {
                         escritor.println("Usuario o contraseña incorrectos. Inténtalo de nuevo.");
                     }
