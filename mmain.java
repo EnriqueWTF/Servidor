@@ -75,29 +75,10 @@ public class mmain {
     }
 
     public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
-        while (true) {
+         while (true) {
             salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion (5) Eliminar cuenta (6) Descargar archivo de otro usuario");
             String opcion = entrada.readLine();
-            if(opcion.equals("6")){
-             
-            salida.println("De que usuario deseas descargar un archivo de mensaje?");
-            String Usuario = entrada.readLine();
-            if(Usuario == null || !userExists(usuario)){
-            salida.print("El usuario:" + Usuario + "No existe");
-            continue;
 
-            } else{
-            salida.print("Archivos de " + Usuario + "----");
-            File buzonObjetivo = new File("messages/" + usuario.trim());
-            File [] archivos = buzonObjetivo.listFiles();
-             if (archivos == null || archivos.length == 0) {
-                    salida.println("El usuario no tiene mensajes para descargar.");
-                    continue; 
-                }
-
-               
-           continue;
-            }
             if (opcion == null || opcion.equals("4")) {
                 salida.println("Cerrando sesion...");
                 break;
@@ -114,7 +95,6 @@ public class mmain {
                     String mensaje = entrada.readLine();
 
                     String Key = UUID.randomUUID().toString();
-                    
                     new File("messages/" + destinatario.trim()).mkdirs();
                     String nombreArchivo = "messages/" + destinatario.trim() + "/" + Key + ".txt";
 
@@ -179,16 +159,26 @@ public class mmain {
                 if (confirmacion != null && confirmacion.equalsIgnoreCase("SI")) {
                     if (deleteUser(usuario)) {
                         salida.println("Tu cuenta ha sido eliminada permanentemente.");
-                        break; 
+                        break;
                     } else {
                         salida.println("Error: No se pudo eliminar la cuenta.");
                     }
                 } else {
                     salida.println("Operacion cancelada.");
                 }
-            }
-        }
+            } else if (opcion.equals("6")) {
+                salida.println("De que usuario deseas descargar un archivo de mensaje?");
+                String usuarioObjetivo = entrada.readLine(); 
+
+           
+                if (usuarioObjetivo == null || !userExists(usuarioObjetivo)) {
+                    salida.println("El usuario:" + usuarioObjetivo + " no existe");
+                    continue;
+                }
+
+            }}
     }
+
 
     public static boolean deleteUser(String username) throws IOException {
      
