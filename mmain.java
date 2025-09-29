@@ -170,9 +170,8 @@ public class mmain {
         }
     }
 
-    private static boolean deleteUser(String usuario) {
-       
-      // 1. Eliminar usuario de nombre.txt
+     public static boolean deleteUser(String username) throws IOException {
+        // 1. Eliminar usuario de nombre.txt
         File userFile = new File("nombre.txt");
         if (!userFile.exists()) return false;
 
@@ -182,10 +181,10 @@ public class mmain {
 
         for (String line : lines) {
             String[] parts = line.split(",");
-            if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(usuario.trim())) {
-                userFound = true; 
+            if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(username.trim())) {
+                userFound = true; // Encontramos al usuario, no añadimos esta línea a la nueva lista
             } else {
-                updatedLines.add(line); 
+                updatedLines.add(line); // Mantenemos esta línea
             }
         }
 
@@ -195,19 +194,26 @@ public class mmain {
         Files.write(Paths.get("nombre.txt"), updatedLines);
 
         // 2. Eliminar el directorio de mensajes del usuario
-        File userMessageDir = new File("messages/" + usuario.trim());
+        File userMessageDir = new File("messages/" + username.trim());
         if (userMessageDir.exists()) {
             return deleteDirectory(userMessageDir);
         }
 
         return true;
     }
- 
-    
-    private static boolean deleteDirectory(File userMessageDir) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteDirectory'");
+
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file); // Llamada recursiva para borrar contenido
+            }
+        }
+        return directoryToBeDeleted.delete(); // Borra la carpeta (ahora vacía) o el archivo
     }
+
+
+
     public static boolean registerUser(String nombreusuario, String password) throws IOException {
         if (userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
             return false;
