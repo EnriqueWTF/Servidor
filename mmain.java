@@ -29,12 +29,11 @@ public class mmain {
             try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
                  PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)) {
 
-                // Bucle para reintentar login/registro
                 while (true) {
                     salida.println("Menu: (1)Registrarte (2)Iniciar sesion");
                     String opcion = entrada.readLine();
                     if (opcion == null) {
-                        break; // El cliente se desconectó
+                        break; 
                     }
 
                     if (opcion.equals("1")) {
@@ -46,7 +45,7 @@ public class mmain {
                         if (registerUser(nuevoUsuario, nuevaPassword)) {
                             salida.println("Usuario " + nuevoUsuario + " registrado correctamente. Iniciando sesion...");
                             UsuarioMensajes(entrada, salida, nuevoUsuario);
-                            break; // Sale del bucle de autenticación
+                            break;
                         } else {
                             salida.println("El usuario ya esta registrado o los datos son inválidos. Inténtalo de nuevo.");
                         }
@@ -60,7 +59,7 @@ public class mmain {
                         if (checkCredentials(loginUser, loginPassword)) {
                             salida.println("Sesion iniciada.");
                             UsuarioMensajes(entrada, salida, loginUser);
-                            break; // Sale del bucle de autenticación
+                            break; 
                         } else {
                             salida.println("Usuario o contraseña incorrectos. Inténtalo de nuevo.");
                         }
@@ -84,18 +83,10 @@ public class mmain {
             salida.println("De que usuario deseas descargar un archivo de mensaje?");
             String Usuario = entrada.readLine();
             if(Usuario == null || !userExists(usuario)){
-            salida.equals("El usuario:" + Usuario + "No existe")
+            salida.print("El usuario:" + Usuario + "No existe");
+            continue;
 
-
-            } 
-
-
-
-
-
-
-
-           continue;
+            }
             }
             if (opcion == null || opcion.equals("4")) {
                 salida.println("Cerrando sesion...");
@@ -113,7 +104,7 @@ public class mmain {
                     String mensaje = entrada.readLine();
 
                     String Key = UUID.randomUUID().toString();
-                    // Asegurarse de que el directorio del destinatario exista
+                    
                     new File("messages/" + destinatario.trim()).mkdirs();
                     String nombreArchivo = "messages/" + destinatario.trim() + "/" + Key + ".txt";
 
@@ -178,7 +169,7 @@ public class mmain {
                 if (confirmacion != null && confirmacion.equalsIgnoreCase("SI")) {
                     if (deleteUser(usuario)) {
                         salida.println("Tu cuenta ha sido eliminada permanentemente.");
-                        break; // Importante: Salir del bucle para terminar la sesión
+                        break; 
                     } else {
                         salida.println("Error: No se pudo eliminar la cuenta.");
                     }
@@ -190,7 +181,7 @@ public class mmain {
     }
 
     public static boolean deleteUser(String username) throws IOException {
-        // 1. Eliminar usuario de nombre.txt
+     
         File userFile = new File("nombre.txt");
         if (!userFile.exists()) return false;
 
@@ -201,18 +192,18 @@ public class mmain {
         for (String line : lines) {
             String[] parts = line.split(",");
             if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(username.trim())) {
-                userFound = true; // Encontramos al usuario, no añadimos esta línea a la nueva lista
+                userFound = true; 
             } else {
-                updatedLines.add(line); // Mantenemos esta línea
+                updatedLines.add(line); 
             }
         }
 
-        if (!userFound) return false; // El usuario no estaba en el archivo
+        if (!userFound) return false; 
 
-        // Sobrescribir el archivo con la lista de usuarios actualizada
+      
         Files.write(Paths.get("nombre.txt"), updatedLines);
 
-        // 2. Eliminar el directorio de mensajes del usuario
+   
         File userMessageDir = new File("messages/" + username.trim());
         if (userMessageDir.exists()) {
             return deleteDirectory(userMessageDir);
