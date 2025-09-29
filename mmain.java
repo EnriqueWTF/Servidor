@@ -204,6 +204,10 @@ public class mmain {
     }
  
     
+    private static boolean deleteDirectory(File userMessageDir) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteDirectory'");
+    }
     public static boolean registerUser(String nombreusuario, String password) throws IOException {
         if (userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
             return false;
