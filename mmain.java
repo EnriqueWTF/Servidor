@@ -96,7 +96,7 @@ public class mmain {
                     }
                     salida.println("Mensaje enviado.");
                 }
-            } else if (opcion.equals("2")) {
+            } if (opcion.equals("2")) {
                 salida.println("--- Tus Mensajes ---");
                 File buzonUsuario = new File("messages/" + usuario.trim());
                 File[] mensajes = buzonUsuario.listFiles();
@@ -110,7 +110,7 @@ public class mmain {
                         salida.println(contenido);
                     }
                 }
-            } else if (opcion.equals("3")) {
+            } if (opcion.equals("3")) {
                 salida.println("--- Eliminar Mensaje ---");
                 File buzonUsuario = new File("messages/" + usuario.trim());
                 File[] mensajes = buzonUsuario.listFiles();
@@ -118,6 +118,12 @@ public class mmain {
                 if (mensajes == null || mensajes.length == 0) {
                     salida.println("No tienes mensajes para eliminar.");
                     continue;
+                }
+                if(opcion.equals("5")){
+
+
+
+                    
                 }
 
                 
