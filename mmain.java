@@ -79,9 +79,15 @@ public class mmain {
         while (true) {
             salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion (5) Eliminar cuenta (6) Descargar archivo de otro usuario");
             String opcion = entrada.readLine();
-            if(opcion.equalsIgnoreCase("6")){
+            if(opcion.equals("6")){
+             
+            salida.println("De que usuario deseas descargar un archivo de mensaje?");
+            String Usuario = entrada.readLine();
+            if(Usuario == null || !userExists(usuario)){
+            salida.equals("El usuario:" + Usuario + "No existe")
 
 
+            } 
 
 
 
