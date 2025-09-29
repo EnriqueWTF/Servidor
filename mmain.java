@@ -15,10 +15,61 @@ import java.io.IOException;
 import java.io.File;  
 
 public class mmain {
-   
+   public static void main(String[] args) throws Exception {
+        new File("messages").mkdirs();
+        ServerSocket servidor = new ServerSocket(8080);
+        System.out.println("Servidor iniciado. Esperando al cliente...");
+
+        while (true) {
+            Socket cliente = servidor.accept();
+            System.out.println("Cliente conectado: " + cliente.getInetAddress());
+  
+            
+            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                 PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)) {
+                
+                salida.println("Menu: (1)Registrarte (2)Iniciar sesion");
+                String opcion = entrada.readLine();
+                
+                if (opcion == null) continue;
+
+                if (opcion.equals("1")) {
+                    salida.println("Nombre:");
+                    String nuevoUsuario = entrada.readLine();
+                    salida.println("Crea una contraseña:");
+                    String nuevaPassword = entrada.readLine();
+    
+                    if (registerUser(nuevoUsuario, nuevaPassword)) {
+                        salida.println("Usuario " + nuevoUsuario + " registrado correctamente. Iniciando sesion...");
+                        UsuarioMensajes(entrada, salida, nuevoUsuario);
+                    } else {
+                        salida.println("El usuario ya esta registrado o los datos son inválidos.");
+                        continue;
+                    }
+                
+                } else if (opcion.equals("2")) {
+                    salida.println("Nombre de usuario para iniciar sesion: ");
+                    String loginUser = entrada.readLine();
+                    salida.println("Contraseña:");
+                    String loginPassword = entrada.readLine();
+
+                    if (checkCredentials(loginUser, loginPassword)) {
+                        salida.println("Sesion iniciada.");
+                        UsuarioMensajes(entrada, salida, loginUser);
+                    } else {
+                        salida.println("Usuario o contraseña incorrectos.");
+                        continue;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error con el cliente: " + e.getMessage());
+            }
+            System.out.println("Cliente desconectado");
+        }
+    }
     public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
         while (true) {
-            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion");
+            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion ");
             String opcion = entrada.readLine();
 
             if (opcion == null || opcion.equals("4")) { 
@@ -134,55 +185,5 @@ public class mmain {
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) throws Exception {
-        new File("messages").mkdirs();
-        ServerSocket servidor = new ServerSocket(8080);
-        System.out.println("Servidor iniciado. Esperando al cliente...");
-
-        while (true) {
-            Socket cliente = servidor.accept();
-            System.out.println("Cliente conectado: " + cliente.getInetAddress());
-  
-            
-            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-                 PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)) {
-                
-                salida.println("Menu: (1)Registrarte (2)Iniciar sesion");
-                String opcion = entrada.readLine();
-                if (opcion == null) continue;
-
-                if (opcion.equals("1")) {
-                    salida.println("Nombre:");
-                    String nuevoUsuario = entrada.readLine();
-                    salida.println("Crea una contraseña:");
-                    String nuevaPassword = entrada.readLine();
-    
-                    if (registerUser(nuevoUsuario, nuevaPassword)) {
-                        salida.println("Usuario " + nuevoUsuario + " registrado correctamente. Iniciando sesion...");
-                        UsuarioMensajes(entrada, salida, nuevoUsuario);
-                    } else {
-                        salida.println("El usuario ya esta registrado o los datos son inválidos.");
-                    }
-                
-                } else if (opcion.equals("2")) {
-                    salida.println("Nombre de usuario para iniciar sesion: ");
-                    String loginUser = entrada.readLine();
-                    salida.println("Contraseña:");
-                    String loginPassword = entrada.readLine();
-
-                    if (checkCredentials(loginUser, loginPassword)) {
-                        salida.println("Sesion iniciada.");
-                        UsuarioMensajes(entrada, salida, loginUser);
-                    } else {
-                        salida.println("Usuario o contraseña incorrectos.");
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Error con el cliente: " + e.getMessage());
-            }
-            System.out.println("Cliente desconectado");
-        }
     }
 }
