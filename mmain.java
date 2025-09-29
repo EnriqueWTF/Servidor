@@ -176,7 +176,59 @@ public class mmain {
                     continue;
                 }
 
-            }}
+                salida.println("Archivos de " + usuarioObjetivo + "----");
+              
+                File buzonObjetivo = new File("messages/" + usuarioObjetivo.trim());
+                File[] archivos = buzonObjetivo.listFiles();
+
+                if (archivos == null || archivos.length == 0) {
+                    salida.println("El usuario no tiene mensajes para descargar.");
+                    continue;
+                }
+
+                List<File> txtFiles = new ArrayList<>();
+                for (File archivo : archivos) { 
+                    if (archivo.isFile()) {
+                        txtFiles.add(archivo);
+                    }
+                }
+
+                if (txtFiles.isEmpty()) {
+                    salida.println("El usuario no tiene mensajes para descargar.");
+                    continue;
+                }
+
+                salida.println("Archivos disponibles:");
+                for (int i = 0; i < txtFiles.size(); i++) {
+                    salida.println("[" + (i + 1) + "] " + txtFiles.get(i).getName());
+                }
+
+                salida.println("Elige el número del archivo a descargar (o 'cancelar'):");
+                String numStr = entrada.readLine();
+                try {
+                    int numToDownload = Integer.parseInt(numStr) - 1;
+                    if (numToDownload >= 0 && numToDownload < txtFiles.size()) {
+                        File archivoADescargar = txtFiles.get(numToDownload);
+                        salida.println("Enviando archivo: " + archivoADescargar.getName());
+
+                        try (BufferedReader fileReader = new BufferedReader(new java.io.FileReader(archivoADescargar))) {
+                            String linea;
+                            while ((linea = fileReader.readLine()) != null) {
+                                salida.println(linea);
+                            }
+                        }
+
+                        salida.println("END_OF_FILE");
+                        salida.println("Transferencia completa.");
+
+                    } else {
+                        salida.println("Número inválido.");
+                    }
+                } catch (NumberFormatException e) {
+                    salida.println("Entrada inválida. Operación cancelada.");
+                }
+            }
+        }
     }
 
 
