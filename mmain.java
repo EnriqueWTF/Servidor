@@ -18,7 +18,7 @@ public class mmain {
 
     public static void main(String[] args) throws Exception {
         new File("messages").mkdirs();
-        new File("files").mkdir();
+        
         ServerSocket servidor = new ServerSocket(8080);
         System.out.println("Servidor iniciado. Esperando al cliente...");
 
@@ -77,7 +77,7 @@ public class mmain {
 
     public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
         while (true) {
-            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion (5) Eliminar cuenta (6) Enviar archivo (7) Descargar archivos");
+            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion (5) Eliminar cuenta (6) Descargar archivo de otro usuario");
             String opcion = entrada.readLine();
 
             if (opcion == null || opcion.equals("4")) {
