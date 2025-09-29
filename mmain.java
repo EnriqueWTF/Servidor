@@ -120,10 +120,19 @@ public class mmain {
                     continue;
                 }
                 if(opcion.equals("5")){
+                salida.print("Estas seguro de que quieres elimar la cuenta? (SI) (NO)");
+                String Cuenta = entrada.readLine();
+                if(Cuenta.equalsIgnoreCase("SI") ){
+                 deleteUser(usuario);
+                 salida.println("Tu cuenta ha sido eliminada permanentemente.");
+                 break;
+                  
+                }if(Cuenta.equalsIgnoreCase("NO") || Cuenta == null){
+                 continue;
 
+                }
 
-
-                    
+                
                 }
 
                 
@@ -157,6 +166,10 @@ public class mmain {
         }
     }
 
+    private static void deleteUser(String usuario) {
+       
+      
+    }
     public static boolean registerUser(String nombreusuario, String password) throws IOException {
         if (userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
             return false;
