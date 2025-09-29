@@ -119,27 +119,7 @@ public class mmain {
                     salida.println("No tienes mensajes para eliminar.");
                     continue;
                 }
-                if(opcion.equals("5")){
-                salida.print("Estas seguro de que quieres elimar la cuenta? (SI) (NO)");
-                String Cuenta = entrada.readLine();
-                if(Cuenta.equalsIgnoreCase("SI") ){
-                 if(deleteUser(usuario)){
-                 salida.println("Tu cuenta ha sido eliminada permanentemente.");
-                 break;
-                 }else{
-                    salida.print("No se pudo eleminar la cuenta.");
-                 }
-               
-                  
-                }if(Cuenta.equalsIgnoreCase("NO") || Cuenta == null){
-                 continue;
-
-                }
-
-                
-                }
-
-                
+            
                 List<File> messageFiles = new ArrayList<>();
                 salida.println("Tus mensajes:");
                 for (int i = 0; i < mensajes.length; i++) {
@@ -166,9 +146,26 @@ public class mmain {
                 } catch (NumberFormatException e) {
                     salida.println("Entrada invalida. Operacion cancelada.");
                 }
+                 if(opcion.equals("5")){
+                salida.print("Estas seguro de que quieres elimar la cuenta? (SI) (NO)");
+                String Cuenta = entrada.readLine();
+                if(Cuenta.equalsIgnoreCase("SI") ){
+                 if(deleteUser(usuario)){
+                 salida.println("Tu cuenta ha sido eliminada permanentemente.");
+                 break;
+                 }else{
+                    salida.print("No se pudo eleminar la cuenta.");
+                 }
+               
+                  
+                }if(Cuenta.equalsIgnoreCase("NO") || Cuenta == null){
+                 continue;
+
+                }
             }
+        }}
         }
-    }
+    
 
      public static boolean deleteUser(String username) throws IOException {
         // 1. Eliminar usuario de nombre.txt
