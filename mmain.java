@@ -86,7 +86,17 @@ public class mmain {
             salida.print("El usuario:" + Usuario + "No existe");
             continue;
 
-            }
+            } else{
+            salida.print("Archivos de " + Usuario + "----");
+            File buzonObjetivo = new File("messages/" + usuario.trim());
+            File [] archivos = buzonObjetivo.listFiles();
+             if (archivos == null || archivos.length == 0) {
+                    salida.println("El usuario no tiene mensajes para descargar.");
+                    continue; 
+                }
+
+               
+           continue;
             }
             if (opcion == null || opcion.equals("4")) {
                 salida.println("Cerrando sesion...");
