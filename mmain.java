@@ -123,9 +123,13 @@ public class mmain {
                 salida.print("Estas seguro de que quieres elimar la cuenta? (SI) (NO)");
                 String Cuenta = entrada.readLine();
                 if(Cuenta.equalsIgnoreCase("SI") ){
-                 deleteUser(usuario);
+                 if(deleteUser(usuario)){
                  salida.println("Tu cuenta ha sido eliminada permanentemente.");
                  break;
+                 }else{
+                    salida.print("No se pudo eleminar la cuenta.");
+                 }
+               
                   
                 }if(Cuenta.equalsIgnoreCase("NO") || Cuenta == null){
                  continue;
@@ -166,10 +170,40 @@ public class mmain {
         }
     }
 
-    private static void deleteUser(String usuario) {
+    private static boolean deleteUser(String usuario) {
        
-      
+      // 1. Eliminar usuario de nombre.txt
+        File userFile = new File("nombre.txt");
+        if (!userFile.exists()) return false;
+
+        List<String> lines = Files.readAllLines(Paths.get("nombre.txt"));
+        List<String> updatedLines = new ArrayList<>();
+        boolean userFound = false;
+
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(usuario.trim())) {
+                userFound = true; 
+            } else {
+                updatedLines.add(line); 
+            }
+        }
+
+        if (!userFound) return false; // El usuario no estaba en el archivo
+
+        // Sobrescribir el archivo con la lista de usuarios actualizada
+        Files.write(Paths.get("nombre.txt"), updatedLines);
+
+        // 2. Eliminar el directorio de mensajes del usuario
+        File userMessageDir = new File("messages/" + usuario.trim());
+        if (userMessageDir.exists()) {
+            return deleteDirectory(userMessageDir);
+        }
+
+        return true;
     }
+ 
+    
     public static boolean registerUser(String nombreusuario, String password) throws IOException {
         if (userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
             return false;
