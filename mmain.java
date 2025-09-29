@@ -69,7 +69,7 @@ public class mmain {
     }
     public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
         while (true) {
-            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion ");
+            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion (5) Eliminar cuenta");
             String opcion = entrada.readLine();
 
             if (opcion == null || opcion.equals("4")) { 
