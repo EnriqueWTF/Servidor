@@ -18,6 +18,7 @@ public class mmain {
 
     public static void main(String[] args) throws Exception {
         new File("messages").mkdirs();
+        new File("files").mkdir();
         ServerSocket servidor = new ServerSocket(8080);
         System.out.println("Servidor iniciado. Esperando al cliente...");
 
