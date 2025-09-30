@@ -7,23 +7,83 @@ import java.util.List;
 import java.util.UUID;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintWriter; 
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.File;  
+import java.io.File;
 
 public class mmain {
-   
-    public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
+
+    public static void main(String[] args) throws Exception {
+        new File("messages").mkdirs();
+        new File("blocks").mkdirs(); 
+        
+        ServerSocket servidor = new ServerSocket(8080);
+        System.out.println("Servidor iniciado. Esperando al cliente...");
+
         while (true) {
-            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion");
+            Socket cliente = servidor.accept();
+            System.out.println("Cliente conectado: " + cliente.getInetAddress());
+
+            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                 PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)) {
+
+                while (true) {
+                    salida.println("Menu: (1)Registrarte (2)Iniciar sesion");
+                    String opcion = entrada.readLine();
+                    if (opcion == null) {
+                        break; 
+                    }
+
+                    if (opcion.equals("1")) {
+                        salida.println("Nombre:");
+                        String nuevoUsuario = entrada.readLine();
+                        salida.println("Crea una contraseña:");
+                        String nuevaPassword = entrada.readLine();
+
+                        if (registerUser(nuevoUsuario, nuevaPassword)) {
+                            salida.println("Usuario " + nuevoUsuario + " registrado correctamente. Iniciando sesion...");
+                            UsuarioMensajes(entrada, salida, nuevoUsuario);
+                            break;
+                        } else {
+                            salida.println("El usuario ya esta registrado o los datos son inválidos. Inténtalo de nuevo.");
+                        }
+
+                    } else if (opcion.equals("2")) {
+                        salida.println("Nombre de usuario para iniciar sesion: ");
+                        String loginUser = entrada.readLine();
+                        salida.println("Contraseña:");
+                        String loginPassword = entrada.readLine();
+
+                        if (checkCredentials(loginUser, loginPassword)) {
+                            salida.println("Sesion iniciada.");
+                            UsuarioMensajes(entrada, salida, loginUser);
+                            break; 
+                        } else {
+                            salida.println("Usuario o contraseña incorrectos. Inténtalo de nuevo.");
+                        }
+                    } else {
+                        salida.println("Opción no válida. Inténtalo de nuevo.");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Error con el cliente: " + e.getMessage());
+            }
+            System.out.println("Cliente desconectado");
+        }
+    }
+
+    public static void UsuarioMensajes(BufferedReader entrada, PrintWriter salida, String usuario) throws IOException {
+         while (true) {
+            salida.println("Elige la opcion que deseas (1) Enviar mensaje (2) Leer mis mensajes (3) Eliminar mensaje (4) Cerrar sesion (5) Eliminar cuenta (6) Descargar archivo (7) Bloquear usuario (8) Desbloquear usuario");
             String opcion = entrada.readLine();
 
-            if (opcion == null || opcion.equals("4")) { 
+            if (opcion == null || opcion.equals("4")) {
                 salida.println("Cerrando sesion...");
-                break; 
+                break;
             }
 
             if (opcion.equals("1")) {
@@ -33,18 +93,26 @@ public class mmain {
                 if (!userExists(destinatario)) {
                     salida.println("Error: El destinatario '" + destinatario + "' no existe.");
                     continue;
-                } else {
-                    salida.println("Escribe tu mensaje:");
-                    String mensaje = entrada.readLine();
-
-                    String Key = UUID.randomUUID().toString();
-                    String nombreArchivo = "messages/" + destinatario.trim() + "/" + Key + ".txt";
-
-                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
-                        writer.write("De: " + usuario.trim() + "\nMensaje: " + mensaje);
-                    }
-                    salida.println("Mensaje enviado.");
                 }
+                
+               
+                if (isBlocked(destinatario, usuario)) {
+                    salida.println("Error: No puedes enviar mensajes a este usuario, te ha bloqueado.");
+                    continue;
+                }
+
+                salida.println("Escribe tu mensaje:");
+                String mensaje = entrada.readLine();
+
+                String Key = UUID.randomUUID().toString();
+                new File("messages/" + destinatario.trim()).mkdirs();
+                String nombreArchivo = "messages/" + destinatario.trim() + "/" + Key + ".txt";
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(nombreArchivo))) {
+                    writer.write("De: " + usuario.trim() + "\nMensaje: " + mensaje);
+                }
+                salida.println("Mensaje enviado.");
+                
             } else if (opcion.equals("2")) {
                 salida.println("--- Tus Mensajes ---");
                 File buzonUsuario = new File("messages/" + usuario.trim());
@@ -69,12 +137,11 @@ public class mmain {
                     continue;
                 }
 
-                
                 List<File> messageFiles = new ArrayList<>();
                 salida.println("Tus mensajes:");
                 for (int i = 0; i < mensajes.length; i++) {
                     messageFiles.add(mensajes[i]);
-                    String contentPreview = new String(Files.readAllBytes(mensajes[i].toPath())).split("\n")[0]; 
+                    String contentPreview = new String(Files.readAllBytes(mensajes[i].toPath())).split("\n")[0];
                     salida.println("[" + (i + 1) + "] " + contentPreview);
                 }
 
@@ -84,7 +151,7 @@ public class mmain {
                 try {
                     int numToDelete = Integer.parseInt(numStr);
                     if (numToDelete > 0 && numToDelete <= messageFiles.size()) {
-                        File fileToDelete = messageFiles.get(numToDelete - 1); 
+                        File fileToDelete = messageFiles.get(numToDelete - 1);
                         if (fileToDelete.delete()) {
                             salida.println("Mensaje eliminado correctamente.");
                         } else {
@@ -96,12 +163,194 @@ public class mmain {
                 } catch (NumberFormatException e) {
                     salida.println("Entrada invalida. Operacion cancelada.");
                 }
+            } else if (opcion.equals("5")) {
+                salida.println("Estas seguro de que quieres eliminar la cuenta? Esto es permanente. (SI/NO)");
+                String confirmacion = entrada.readLine();
+                if (confirmacion != null && confirmacion.equalsIgnoreCase("SI")) {
+                    if (deleteUser(usuario)) {
+                        salida.println("Tu cuenta ha sido eliminada permanentemente.");
+                        break;
+                    } else {
+                        salida.println("Error: No se pudo eliminar la cuenta.");
+                    }
+                } else {
+                    salida.println("Operacion cancelada.");
+                }
+            } else if (opcion.equals("6")) {
+                salida.println("De que usuario deseas descargar un archivo de mensaje?");
+                String usuarioObjetivo = entrada.readLine(); 
+
+                if (usuarioObjetivo == null || !userExists(usuarioObjetivo)) {
+                    salida.println("El usuario:" + usuarioObjetivo + " no existe");
+                    continue;
+                }
+
+                salida.println("Archivos de " + usuarioObjetivo + "----");
+                File buzonObjetivo = new File("messages/" + usuarioObjetivo.trim());
+                File[] archivos = buzonObjetivo.listFiles();
+
+                if (archivos == null || archivos.length == 0) {
+                    salida.println("El usuario no tiene mensajes para descargar.");
+                    continue;
+                }
+
+                List<File> txtFiles = new ArrayList<>();
+                for (File archivo : archivos) { 
+                    if (archivo.isFile()) {
+                        txtFiles.add(archivo);
+                    }
+                }
+
+                if (txtFiles.isEmpty()) {
+                    salida.println("El usuario no tiene mensajes para descargar.");
+                    continue;
+                }
+
+                salida.println("Archivos disponibles:");
+                for (int i = 0; i < txtFiles.size(); i++) {
+                    salida.println("[" + (i + 1) + "] " + txtFiles.get(i).getName());
+                }
+
+                salida.println("Elige el número del archivo a descargar (o 'cancelar'):");
+                String numStr = entrada.readLine();
+                try {
+                    int numToDownload = Integer.parseInt(numStr) - 1;
+                    if (numToDownload >= 0 && numToDownload < txtFiles.size()) {
+                        File archivoADescargar = txtFiles.get(numToDownload);
+                        salida.println("Enviando archivo: " + archivoADescargar.getName());
+
+                        try (BufferedReader fileReader = new BufferedReader(new FileReader(archivoADescargar))) {
+                            String linea;
+                            while ((linea = fileReader.readLine()) != null) {
+                                salida.println(linea);
+                            }
+                        }
+
+                        salida.println("END_OF_FILE");
+                        salida.println("Transferencia completa.");
+
+                    } else {
+                        salida.println("Número inválido.");
+                    }
+                } catch (NumberFormatException e) {
+                    salida.println("Entrada inválida. Operación cancelada.");
+                }
+            } else if (opcion.equals("7")) { 
+                salida.println("Escribe el nombre del usuario que quieres bloquear:");
+                String userToBlock = entrada.readLine();
+                if (blockUser(usuario, userToBlock)) {
+                    salida.println("Usuario '" + userToBlock + "' ha sido bloqueado.");
+                } else {
+                    salida.println("Error: No se pudo bloquear al usuario. Puede que no exista o ya esté bloqueado.");
+                }
+            } else if (opcion.equals("8")) {
+                salida.println("Escribe el nombre del usuario que quieres desbloquear:");
+                String userToUnblock = entrada.readLine();
+                if (unblockUser(usuario, userToUnblock)) {
+                    salida.println("Usuario '" + userToUnblock + "' ha sido desbloqueado.");
+                } else {
+                    salida.println("Error: No se pudo desbloquear al usuario. Puede que no estuviera en tu lista de bloqueados.");
+                }
             }
         }
     }
 
+  
+
+    public static boolean isBlocked(String receiver, String sender) throws IOException {
+        File blockFile = new File("blocks/" + receiver.trim() + ".txt");
+        if (!blockFile.exists()) {
+            return false;
+        }
+        List<String> blockedUsers = Files.readAllLines(blockFile.toPath());
+        for (String blockedUser : blockedUsers) {
+            if (blockedUser.trim().equalsIgnoreCase(sender.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean blockUser(String blocker, String userToBlock) throws IOException {
+        if (userToBlock == null || !userExists(userToBlock) || blocker.equalsIgnoreCase(userToBlock) || isBlocked(blocker, userToBlock)) {
+            return false;
+        }
+        String blockFilePath = "blocks/" + blocker.trim() + ".txt";
+        String lineToAppend = userToBlock.trim() + System.lineSeparator();
+        Files.write(Paths.get(blockFilePath), lineToAppend.getBytes(), StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+        return true;
+    }
+
+    public static boolean unblockUser(String unblocker, String userToUnblock) throws IOException {
+        File blockFile = new File("blocks/" + unblocker.trim() + ".txt");
+        if (!blockFile.exists()) {
+            return false;
+        }
+
+        List<String> lines = Files.readAllLines(blockFile.toPath());
+        List<String> updatedLines = new ArrayList<>();
+        boolean userWasBlocked = false;
+
+        for (String line : lines) {
+            if (line.trim().equalsIgnoreCase(userToUnblock.trim())) {
+                userWasBlocked = true;
+            } else {
+                updatedLines.add(line);
+            }
+        }
+
+        if (userWasBlocked) {
+            Files.write(blockFile.toPath(), updatedLines);
+        }
+        return userWasBlocked;
+    }
+
+    public static boolean deleteUser(String username) throws IOException {
+        File userFile = new File("nombre.txt");
+        if (!userFile.exists()) return false;
+
+        List<String> lines = Files.readAllLines(Paths.get("nombre.txt"));
+        List<String> updatedLines = new ArrayList<>();
+        boolean userFound = false;
+
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts.length > 0 && parts[0].trim().equalsIgnoreCase(username.trim())) {
+                userFound = true; 
+            } else {
+                updatedLines.add(line); 
+            }
+        }
+
+        if (!userFound) return false; 
+
+        Files.write(Paths.get("nombre.txt"), updatedLines);
+
+        File userMessageDir = new File("messages/" + username.trim());
+        if (userMessageDir.exists()) {
+            deleteDirectory(userMessageDir);
+        }
+
+        File blockFile = new File("blocks/" + username.trim() + ".txt");
+        if (blockFile.exists()) {
+            blockFile.delete();
+        }
+
+        return true;
+    }
+
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
+    }
+
     public static boolean registerUser(String nombreusuario, String password) throws IOException {
-        if (userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
+        if (nombreusuario == null || nombreusuario.trim().isEmpty() || userExists(nombreusuario) || password == null || password.trim().isEmpty()) {
             return false;
         }
         String userLine = nombreusuario.trim() + "," + password.trim() + System.lineSeparator();
@@ -111,7 +360,7 @@ public class mmain {
     }
 
     public static boolean userExists(String nombreusario) throws IOException {
-        File usuarios = new File("nombre.txt");    
+        File usuarios = new File("nombre.txt");
         if (!usuarios.exists() || nombreusario == null) return false;
         List<String> lineas = Files.readAllLines(Paths.get("nombre.txt"));
         for (String linea : lineas) {
@@ -134,55 +383,5 @@ public class mmain {
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) throws Exception {
-        new File("messages").mkdirs();
-        ServerSocket servidor = new ServerSocket(8080);
-        System.out.println("Servidor iniciado. Esperando al cliente...");
-
-        while (true) {
-            Socket cliente = servidor.accept();
-            System.out.println("Cliente conectado: " + cliente.getInetAddress());
-  
-            
-            try (BufferedReader entrada = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
-                 PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)) {
-                
-                salida.println("Menu: (1)Registrarte (2)Iniciar sesion");
-                String opcion = entrada.readLine();
-                if (opcion == null) continue;
-
-                if (opcion.equals("1")) {
-                    salida.println("Nombre:");
-                    String nuevoUsuario = entrada.readLine();
-                    salida.println("Crea una contraseña:");
-                    String nuevaPassword = entrada.readLine();
-    
-                    if (registerUser(nuevoUsuario, nuevaPassword)) {
-                        salida.println("Usuario " + nuevoUsuario + " registrado correctamente. Iniciando sesion...");
-                        UsuarioMensajes(entrada, salida, nuevoUsuario);
-                    } else {
-                        salida.println("El usuario ya esta registrado o los datos son inválidos.");
-                    }
-                
-                } else if (opcion.equals("2")) {
-                    salida.println("Nombre de usuario para iniciar sesion: ");
-                    String loginUser = entrada.readLine();
-                    salida.println("Contraseña:");
-                    String loginPassword = entrada.readLine();
-
-                    if (checkCredentials(loginUser, loginPassword)) {
-                        salida.println("Sesion iniciada.");
-                        UsuarioMensajes(entrada, salida, loginUser);
-                    } else {
-                        salida.println("Usuario o contraseña incorrectos.");
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Error con el cliente: " + e.getMessage());
-            }
-            System.out.println("Cliente desconectado");
-        }
     }
 }
